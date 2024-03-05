@@ -74,6 +74,10 @@ import matplotlib.pyplot as plt
 # 設定中文字型
 plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei']
 plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['xtick.labelsize'] = 6
+# 設定 x 軸刻度間隔
+plt.xticks(rotation=100)
+
 # 設定圖片大小
 plt.figure(figsize=(10, 6))
 # 繪製折線圖
@@ -81,6 +85,8 @@ plt.plot(df2[df2.columns[0]], df2[df2.columns[1]], label='92無鉛汽油')
 plt.plot(df2[df2.columns[0]], df2[df2.columns[2]], label='95無鉛汽油')
 plt.plot(df2[df2.columns[0]], df2[df2.columns[3]], label='98無鉛汽油')
 plt.plot(df2[df2.columns[0]], df2[df2.columns[4]], label='超級柴油')
+
+
 # 設定圖例
 plt.legend()
 # 顯示圖片
@@ -92,9 +98,3 @@ df2[df2.columns[0]] = pd.to_datetime(df2[df2.columns[0]])
 
 print (df2)
 
-# 使用 matplotlib x,y 散佈圖 , x 軸是日期 , 後面四個欄位是 油價 ，分別是 92無鉛汽油,95無鉛汽油,98無鉛汽油,超級柴油 
-import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']  # 設定字型為中文字型
-plt.plot(df2[df2.columns[0]], df2[df2.columns[1]], label='92無鉛汽油')
-plt.legend(loc='upper left')
-plt.show()
