@@ -50,11 +50,15 @@ print(df1[['事件開始', '事件排除', '國道名稱','里程','事件開始
 #以 '里程' 為 y軸 , '事件開始1' 為 x軸 起點 , '事件排除1' 為 x軸 終點 繪製線段
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']  # 設定字型為中文字型
+
 
 # 假設 df 是您的 DataFrame
 for index, row in df1.iterrows():
     plt.plot([row['事件開始1'], row['事件排除1']], [row['里程'], row['里程']])
+
+# 設定字型為中文
+plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei']
+
 
 plt.xlabel('事件時間')
 plt.ylabel('里程')
