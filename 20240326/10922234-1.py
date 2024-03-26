@@ -2,6 +2,9 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import pandas as pd
+import os
+import glob
 
 # 定義基本網址
 base_url = "https://tisvcloud.freeway.gov.tw/history/TDCS/M04A/20240325/"
@@ -41,3 +44,28 @@ for hour in range(24):
     else:
         print("Failed to retrieve data from", url)
 
+
+
+# 定義CSV檔案的路徑
+csv_folder_path = "C:\\Users\\User\\Desktop\\csv"
+
+# 找到資料夾中的所有CSV檔案
+csv_files = glob.glob(os.path.join(csv_folder_path, "*.csv"))
+
+# 創建一個空的DataFrame來儲存所有的數據
+df = pd.DataFrame()
+
+# 遍歷所有的CSV檔案
+for file in csv_files:
+    # 讀取CSV檔案
+    data = pd.read_csv(file)
+
+    # 將讀取的數據添加到DataFrame中
+    df = df.append(data, ignore_index=True)
+
+# 定義新的CSV檔案名稱和儲存位置
+new_filename = "combined.csv"
+new_file_path = os.path.join(os.path.expanduser("~"), "Desktop", new_filename)
+
+# 將DataFrame寫入到一個新的CSV檔案中
+df.to_csv(new_file_path, index=False)
