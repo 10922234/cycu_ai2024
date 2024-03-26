@@ -2,7 +2,6 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-import glob
 
 # 定義基本網址
 base_url = "https://tisvcloud.freeway.gov.tw/history/TDCS/M04A/20240325/"
@@ -42,19 +41,3 @@ for hour in range(24):
     else:
         print("Failed to retrieve data from", url)
 
-        # 取得所有csv檔案的路徑
-        csv_files = glob.glob(os.path.join(desktop_path, "*.csv"))
-
-        # 定義合併後的檔案路徑
-        merged_file_path = os.path.join(desktop_path, "merged.csv")
-
-        # 開啟合併後的檔案
-        with open(merged_file_path, "w") as merged_file:
-            # 遍歷所有csv檔案
-            for csv_file in csv_files:
-                # 開啟csv檔案
-                with open(csv_file, "r") as file:
-                    # 讀取csv檔案內容
-                    csv_content = file.read()
-                    # 將csv內容寫入合併後的檔案
-                    merged_file.write(csv_content)
