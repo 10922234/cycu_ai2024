@@ -4,13 +4,12 @@
 #read 20240402/tract_20140313.json as geopanas
 import geopandas as gpd
 import pandas as pd
-# read shape file 'C:\Users\User\Downloads\COUNTY_MOI_1090820.shp'
-shape_file = 'C:\\Users\\User\\Downloads\\COUNTY_MOI_1090820.shp'
-taiwan = gpd.read_file(shape_file)
 
+#read shape file
+taiwan=gpd.read_file('C:\Users\User\Downloads\mapdata202301070205\COUNTY_MOI_1090820')
 import os
 #print cwd
-print (taiwan)
+print (taiwan.shape)
 
 #plot taiwan using matplotlib
 import matplotlib.pyplot as plt
