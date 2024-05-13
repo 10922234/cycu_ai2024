@@ -15,7 +15,7 @@ for hour in range(24):
     # 遍歷每個五分鐘的時間段
     for minute in range(0, 60, 5):
         # 建立 URL
-        url = f"{base_url}{str(hour).zfill(2)}/TDCS_M04A_20240429_{str(hour).zfill(2)}{str(minute).zfill(2)}00.csv"
+        url = f"{base_url}{str(hour).zfill(2)}/TDCS_M03A_20240429_{str(hour).zfill(2)}{str(minute).zfill(2)}00.csv"
         
         # 嘗試下載 CSV 檔案
         try:
@@ -34,4 +34,4 @@ dfs = pd.concat(dfs,axis=0)
 dfs.sort_index(inplace=True)
 
 # 輸出為一個新的 CSV 檔案
-dfs.to_csv("C:\\Users\\User\\Desktop\\cycu_ai2024\\20240430\\output1.csv")
+dfs.to_csv("C:\\Users\\User\\Desktop\\csv\\output1.csv")
