@@ -47,6 +47,9 @@ dataframe1 = dataframe1[(dataframe1['to_highwaynumber'] == '01F') & (dataframe1[
 dataframe1['millage'] = dataframe1['millage'].astype(int)
 print(dataframe1.head(), dataframe1.tail(), dataframe1.shape)
 
+#儲存檔案在目錄
+dataframe1.to_csv('TDCS_M05A_20240429_cub.csv', index=False)
+
 # sort the dataframe by millage
 dataframe1 = dataframe1.sort_values(by='millage')
 x = dataframe1['millage']
