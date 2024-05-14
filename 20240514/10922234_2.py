@@ -1,90 +1,68 @@
-#!/bin/python
-import io
-import requests
-import datetime
-import requests
-import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from pandas import DataFrame as  df 
+from pandas import read_csv
+from scipy.interpolate import CubicSpline
 
 # M03A : TimeInterval、GantryID、Direction、VehicleType、交通量
 # M04A : TimeInterval、GantryFrom、GantryTo、VehicleType、TravelTime、交通量
 # M05A : TimeInterval、GantryFrom、GantryTo、VehicleType、SpaceMeanSpeed、交通量
 # M06A : VehicleType、DetectionTime_O、GantryID_O、DetectionTime_D、GantryID_D、TripLength、TripEnd、TripInformation
 
-data_columns = {
-    'M03A':['TimeInterval','GantryID','Direction','VehicleType','TrafficVolume'],
-    'M04A':['TimeInterval','GantryFrom','GantryTo','VehicleType','TravelTime','TrafficVolume'],
-    'M05A':['TimeInterval','GantryFrom','GantryTo','VehicleType','SpaceMeanSpeed','TrafficVolume']
-    }
+# the columns of TDCS_M05A_20240429_5.csv  lists as follows:
+# TimeInterval,GantryFrom,GantryTo,SpaceMeanSpeed,tv31,tv32,tv41,tv42,tv5
 
-#define a function to get one day data
-def get_one_day_data(year, month, day, data_type):
+#read ('TDCS_M05A_20240429_5.csv', index=False) as df
+# the first line is column names
 
-    today = datetime.datetime(year, month, day, 0, 0, 0)
+dataframe1 = read_csv('C:\\Users\\User\\Documents\\GitHub\\cycu_ai2024\\20240514\\TDCS_M05A_20240429_5.csv', index_col=False)
 
-    if data_type not in data_columns:
-        raise ValueError('data_type should be one of M03A, M04A, M05A, M06A')
-       
-    df_columns = data_columns[data_type]
 
-    target_df = pd.DataFrame(columns=df_columns)
+#  TimeInterval format as 2024/04/29 00:00
+# convert TimeInterval to integer to represent nth 5-minute interval of the day
+# the first interval is 0
+dataframe1['TimeInterval'] = dataframe1['TimeInterval'].str.split(' ').str[1].str.split(':').str[0].astype(int)*12 + dataframe1['TimeInterval'].str.split(' ').str[1].str.split(':').str[1].astype(int)/5
 
-    # sample url https://tisvcloud.freeway.gov.tw/history/TDCS/M03A/20240429/00/TDCS_M03A_20240429_005500.csv
-    for i in range(0, 288):
-        timestep = today + datetime.timedelta(minutes=5*i)
-        timestep_str_d = timestep.strftime('%Y%m%d')
-        timestep_str_h = timestep.strftime('%H')
-        timestep_str_m = timestep.strftime('%H%M00')
+# GantryFrom format as 03F0000S
+# spearte the number first 3 characters as highwaynumber ,the 4-7th characters as millage, the 8th character as direction
+dataframe1['highwaynumber'] = dataframe1['GantryFrom'].str[0:3]
+dataframe1['millage'] = dataframe1['GantryFrom'].str[3:7] 
+dataframe1['direction'] = dataframe1['GantryFrom'].str[7]
 
-        filename = 'TDCS_' + data_type + '_' + timestep_str_d + '_' + timestep_str_m + '.csv'
 
-        url = 'https://tisvcloud.freeway.gov.tw/history/TDCS/' + data_type + '/' + timestep_str_d + '/' + timestep_str_h + '/' + filename
+# GantryTo format as 03F0000S
+# spearte the number first 3 characters as highwaynumber ,the 4-7th characters as millage, the 8th character as direction
+dataframe1['to_highwaynumber'] = dataframe1['GantryTo'].str[0:3]
+dataframe1['to_millage'] = dataframe1['GantryTo'].str[3:7]
+dataframe1['to_direction'] = dataframe1['GantryTo'].str[7]
 
-        print(url)
-        r = requests.get(url)
 
-        # convert r to dataframe without column names in the first row
-        # specify header=None to avoid the first row being treated as column names
-        # column names will be {'t','g','d','vtype','num'}
-        df = pd.read_csv(io.StringIO(r.text), header=None)
-        df.columns = df_columns
-        
-        target_df = pd.concat([target_df, df], ignore_index=True)
-        print (target_df.head(), target_df.tail(), target_df.shape)
+#filter the data with timeinterval = 0.0 , highwaynumber = '01F' and direction = 'S'
+dataframe1 = dataframe1[(dataframe1['TimeInterval'] == 0.0) & (dataframe1['highwaynumber'] == '01F') & (dataframe1['direction'] == 'S')]
 
-    output_filename = 'TDCS_' + data_type + '_' + timestep_str_d + '.csv'
-    target_df.to_csv(output_filename, index=False)
+#filter the data with to_highwaynumber = '01F' and to_direction = 'S'
+dataframe1 = dataframe1[(dataframe1['to_highwaynumber'] == '01F') & (dataframe1['to_direction'] == 'S')]
 
-    return target_df
+#convert the millage to integer
+dataframe1['millage'] = dataframe1['millage'].astype(int)
+print(dataframe1.head(), dataframe1.tail(), dataframe1.shape)
 
-def data_c(df):
+# sort the dataframe by millage
+dataframe1 = dataframe1.sort_values(by='millage')
+x = dataframe1['millage']
+y = dataframe1['tv31']
 
-    print(df.head(), df.tail(), df.shape)
 
-    df_31 = df [df['VehicleType'] == 31]
-    df_32 = df [df['VehicleType'] == 32]
-    df_41 = df [df['VehicleType'] == 41]
-    df_42 = df [df['VehicleType'] == 42]
-    df_5  = df [df['VehicleType'] == 5]
+cs = CubicSpline(x, y)
 
-    df_31.reset_index(drop=True, inplace=True)
-    df_32.reset_index(drop=True, inplace=True)
-    df_41.reset_index(drop=True, inplace=True)
-    df_42.reset_index(drop=True, inplace=True)
-    df_5.reset_index(drop=True, inplace=True)
+new_x = np.linspace(x.min(), x.max(), 500)
+new_y = cs(new_x)
 
-    df_5['tv31']    = df_31['TrafficVolume']
-    df_5['tv32']    = df_32['TrafficVolume']
-    df_5['tv41']    = df_41['TrafficVolume']
-    df_5['tv42']    = df_42['TrafficVolume']
-    df_5['tv5']     = df_5['TrafficVolume']
+# # 畫出擬合後的曲線
+fig = plt.figure()
+plt.plot(x, y, 'o', label='data')
+plt.plot(new_x, new_y, label="spline")
+plt.legend()
+plt.savefig('cubicspline.png')
 
-    # drop columns VehicleType and TrafficVolume
-    df_5 = df_5.drop(columns=['VehicleType', 'TrafficVolume'])
-
-    print(df_5.head(), df_5.tail(), df_5.shape)
-
-    df_5.to_csv('C:\\Users\\User\\Desktop\\TDCS_M03A_20240429_5.csv', index=False)
-
-if __name__ == '__main__':
-    df = get_one_day_data(2024, 4, 29, 'M05A')
-    data_c(df)
+plt.show()
