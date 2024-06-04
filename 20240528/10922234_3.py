@@ -15,8 +15,8 @@ import webbrowser  # Import the missing module
 from folium.plugins import TimestampedGeoJson  # Import the missing module
 
 # 讀取檔案
-file_path_1 = r"C:\Users\User\OneDrive\M05A\M05A_整理\M05A_20240429.csv"
-file_path_2 = r"C:\Users\User\OneDrive\M05A\M05A_0429\國道計費門架座標及里程牌價表1130327.csv"
+file_path_1 = r"C:\Users\waes3\OneDrive - cycu.org.tw\文件\Downloads\M05A\M05A_20240429.csv"
+file_path_2 = r"C:\Users\waes3\OneDrive - cycu.org.tw\文件\Downloads\M05A\M05A_0429\國道計費門架座標及里程牌價表1130327.csv"
 df = pd.read_csv(file_path_1)
 df_information = pd.read_csv(file_path_2)
 
